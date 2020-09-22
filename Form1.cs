@@ -1,16 +1,7 @@
 ﻿using ExcelDataReader;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.WebRequestMethods;
 
 namespace AdaptEtu
 {
@@ -34,8 +25,6 @@ namespace AdaptEtu
             {
                 string file = openFileDialog1.FileName;
 
-                Excel excel = new Excel(file, 1);
-
                 return file;
             }
             return "";
@@ -58,11 +47,11 @@ namespace AdaptEtu
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     txtFilename.Text = ofd.FileName;
-                    using (var stream = System.IO.File.Open(ofd.FileName, FileMode.Open, FileAccess.Read))
+                    using (var stream = File.Open(ofd.FileName, FileMode.Open, FileAccess.Read))
                     {
                         IExcelDataReader reader;
 
-                        reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream);
+                        reader = ExcelReaderFactory.CreateReader(stream);
 
                         //// reader.IsFirstRowAsColumnNames
                         var conf = new ExcelDataSetConfiguration
@@ -79,11 +68,6 @@ namespace AdaptEtu
                         var dataTableEtu = dataSet.Tables[0];
                         var dataTableTuteur = dataSet.Tables[1];
 
-                        var cellStr = "AB2"; // var cellStr = "A1";
-                        var match = Regex.Match(cellStr, @"(?<col>[A-Z]+)(?<row>\d+)");
-                        var colStr = match.Groups["col"].ToString();
-                        var col = colStr.Select((t, i) => (colStr[i] - 64) * Math.Pow(26, colStr.Length - i - 1)).Sum();
-                        var row = int.Parse(match.Groups["row"].ToString());
 
                         for (var i = 0; i < dataTableEtu.Rows.Count; i++)
                         {
