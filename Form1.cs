@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
+
+using OfficeOpenXml;
+using OfficeOpenXml.Drawing.Style.ThreeD;
 
 namespace AdaptEtu
 {
@@ -21,8 +23,12 @@ namespace AdaptEtu
         int id_year_tuteur;
         int id_discipline_tuteur;
 
+        ExcelPackage excel;
+
         public Form1()
         {
+            
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             disciplines = new List<string>();
             years = new List<string>();
             destination = "";
@@ -30,16 +36,6 @@ namespace AdaptEtu
         }
 
 
-        private string get_file_name(DialogResult result)
-        {
-            if (result == DialogResult.OK)
-            {
-                string file = openFileDialog1.FileName;
-
-                return file;
-            }
-            return "";
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -66,8 +62,20 @@ namespace AdaptEtu
                         var dataSet = reader.AsDataSet(conf);
 
                         // Now you can get data from each sheet by its index or its "name"
+                        
                         dataTableEtu = dataSet.Tables[1];
+                        dataTableEtu.Columns.Add("role");
+                        for (int i = 0; i <= dataTableEtu.Rows.Count-1; i++)
+                        {
+                            dataTableEtu.Rows[i]["role"] = "ETUDIANT";
+                        }
+                        
                         dataTableTuteur = dataSet.Tables[0];
+                        dataTableTuteur.Columns.Add("role");
+                        for (int i = 0; i <= dataTableTuteur.Rows.Count - 1; i++)
+                        {
+                            dataTableTuteur.Rows[i]["role"] = "TUTEUR";
+                        }
                     }
 
 
@@ -77,9 +85,15 @@ namespace AdaptEtu
 
         private void button2_Click(object sender, EventArgs e)
         {
-            DialogResult result = openFileDialog1.ShowDialog();
-            destination = get_file_name(result);
-            Console.WriteLine(destination);            
+            using (SaveFileDialog result = new SaveFileDialog())
+            {
+                if (result.ShowDialog() == DialogResult.OK)
+                {
+                    destination = result.FileName;
+
+                    excel = new ExcelPackage();
+                }
+            }
         }
 
         public void instantiate_years_disciplines_list()
@@ -121,19 +135,55 @@ namespace AdaptEtu
                     years.Add(yea);
             }
 
+        }
 
-            foreach (string elt in disciplines)
+        private void create_new_excel(DataRow[] result, DataRow tuteur)
+        {
+            //DataTable dt = new DataTable(result[0][id_year_etu].ToString());
+
+            if (result.Length != 0)
             {
-                Console.WriteLine("elt: " + elt);
-            }
-            foreach (string elt in years)
-            {
-                Console.WriteLine("elt: " + elt);
+
+                var res = result.AsEnumerable().CopyToDataTable();
+                ExcelWorksheet worksheet = excel.Workbook.Worksheets[result[0][id_year_etu].ToString()];
+                if (worksheet == null)
+                {
+                    worksheet = excel.Workbook.Worksheets.Add(result[0][id_year_etu].ToString());
+                }
+
+                var headerRow = new List<string[]>()
+                {
+                   tuteur.ItemArray.Cast<string>().ToArray()
+                };
+                int idx = 1;
+                if(worksheet.Dimension != null) idx = worksheet.Dimension.End.Row+2;
+                string hearderRange = "A" + idx + ":" + "F" + idx;
+                worksheet.Cells[hearderRange].LoadFromArrays(headerRow);
+                idx++;
+                for (int i = 0; i <= result.Length - 1; i++)
+                {
+                    hearderRange = "A" + idx + ":" + "F" + idx;
+                    headerRow = new List<string[]>()
+                {
+                   result[i].ItemArray.Cast<string>().ToArray()
+                };
+                    Console.WriteLine(String.Join(" : ", result[i].ItemArray) + "\n");
+                    worksheet.Cells[hearderRange].LoadFromArrays(headerRow);
+                    idx++;
+                    
+                }
+                hearderRange = "A" + idx + ":" + "F" + idx;
+                worksheet.Cells[hearderRange].LoadFromArrays(new List<string[]>());
+                idx++;
+                hearderRange = "A" + idx + ":" + "F" + idx;
+                worksheet.Cells[hearderRange].LoadFromArrays(new List<string[]>());
+                idx++;
+
+                FileInfo excelFile = new FileInfo(@destination);
+                excel.SaveAs(excelFile);
             }
         }
 
-
-        
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -143,59 +193,22 @@ namespace AdaptEtu
             }
             instantiate_years_disciplines_list();
 
-            foreach(string year in years)
+            foreach (string year in years)
             {
                 var rows_tuteur = dataTableTuteur.AsEnumerable().CopyToDataTable();
                 var rows_etu = dataTableEtu.AsEnumerable().CopyToDataTable();
                 DataRow[] results_tuteur = rows_tuteur.Select("année like '%" + year + "%'");
                 DataRow[] results_etu = rows_etu.Select("année like '%" + year + "%'");
-                
-                foreach(DataRow row in results_tuteur)
+
+                foreach (DataRow row in results_tuteur)
                 {
                     var rows_final = results_etu.AsEnumerable().CopyToDataTable();
                     DataRow[] final_results = rows_final.Select("discipline like '%" + row[id_discipline_tuteur] + "%'");
 
-                    Console.WriteLine(String.Join(" : ", row.ItemArray) + "\n");
-                    foreach(DataRow r in final_results)
-                    {
-                        Console.WriteLine(String.Join(" : ", r.ItemArray));
-                    }
-                    Console.WriteLine("STOOOOOOOOP\n\n\n\n\n");
+                    create_new_excel(final_results, row);
+
                 }
             }
-
-
-            /**
-            foreach(DataRow row in dataTableEtu.Select())
-            {
-                Console.WriteLine(row[id_year_etu]);
-                DataRow[] results_tuteur = dataTableTuteur.Select("Année = "+row[id_year_etu].ToString());
-                foreach(DataRow rows in results_tuteur)
-                {
-                    Console.WriteLine(rows[id_year_etu]);
-                }
-                
-            }
-            **/
-
-            /**
-            for (var i = 0; i < dataTableEtu.Rows.Count; i++)
-            {
-                for (var j = 0; j < dataTableEtu.Columns.Count; j++)
-                {
-                    var data = dataTableEtu.Rows[i][j];
-                    Console.WriteLine("data: i: "+i+" j: "+j+" "+ data);
-                }
-            }
-
-            for (var i = 0; i < dataTableTuteur.Rows.Count; i++)
-            {
-                for (var j = 0; j < dataTableTuteur.Columns.Count; j++)
-                {
-                    var data = dataTableTuteur.Rows[i][j];
-                    Console.WriteLine("data Tuteur: i: " + i + " j: " + j +" "+ data);
-                }
-            }**/
         }
 
     }
