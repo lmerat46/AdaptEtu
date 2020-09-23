@@ -37,6 +37,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
             this.txtFilename = new System.Windows.Forms.TextBox();
+            this.txtFilename2 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -50,11 +51,11 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(392, 97);
+            this.button1.Location = new System.Drawing.Point(525, 97);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(23, 23);
             this.button1.TabIndex = 1;
-            this.button1.Text = "choisir";
+            this.button1.Text = "...";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -72,7 +73,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(116, 161);
+            this.label3.Location = new System.Drawing.Point(12, 164);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(80, 13);
             this.label3.TabIndex = 3;
@@ -80,17 +81,17 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(392, 152);
+            this.button2.Location = new System.Drawing.Point(525, 152);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 22);
+            this.button2.Size = new System.Drawing.Size(23, 22);
             this.button2.TabIndex = 4;
-            this.button2.Text = "choisir";
+            this.button2.Text = "...";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(218, 225);
+            this.button3.Location = new System.Drawing.Point(209, 224);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(177, 28);
             this.button3.TabIndex = 5;
@@ -108,16 +109,24 @@
             // 
             // txtFilename
             // 
-            this.txtFilename.Location = new System.Drawing.Point(218, 161);
+            this.txtFilename.Location = new System.Drawing.Point(209, 100);
             this.txtFilename.Name = "txtFilename";
-            this.txtFilename.Size = new System.Drawing.Size(152, 20);
+            this.txtFilename.Size = new System.Drawing.Size(295, 20);
             this.txtFilename.TabIndex = 6;
+            // 
+            // txtFilename2
+            // 
+            this.txtFilename2.Location = new System.Drawing.Point(209, 161);
+            this.txtFilename2.Name = "txtFilename2";
+            this.txtFilename2.Size = new System.Drawing.Size(295, 20);
+            this.txtFilename2.TabIndex = 7;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(609, 295);
+            this.Controls.Add(this.txtFilename2);
             this.Controls.Add(this.txtFilename);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -143,6 +152,7 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.TextBox txtFilename;
+        private System.Windows.Forms.TextBox txtFilename2;
     }
 }
 

@@ -89,6 +89,7 @@ namespace AdaptEtu
             {
                 if (result.ShowDialog() == DialogResult.OK)
                 {
+                    txtFilename2.Text = result.FileName;
                     destination = result.FileName;
 
                     excel = new ExcelPackage();
@@ -209,6 +210,7 @@ namespace AdaptEtu
 
                 }
             }
+            Application.Exit();
         }
 
     }
